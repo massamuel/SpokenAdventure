@@ -1,0 +1,921 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Line 1 — Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Libre+Franklin:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#0E1419; --panel:#161F26; --sunk:#111A20; --line:#243139;
+  --ink:#E4E9EC; --dim:#8598A4; --faint:#5A6B77;
+  --brass:#D6A353; --good:#5FBF8F; --warn:#E0B44B; --bad:#E4796A; --blu:#79ADD1;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Libre Franklin",-apple-system,BlinkMacSystemFont,sans-serif;font-size:15px}
+header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:14px 22px;border-bottom:2px solid var(--line);background:var(--panel)}
+h1{font-family:"Oswald",sans-serif;font-weight:600;text-transform:uppercase;
+  letter-spacing:.05em;font-size:19px;margin:0}
+h1 span{color:var(--brass)}
+.pills{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.pill{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;border:1px solid var(--line);border-radius:2px;
+  padding:5px 10px;color:var(--faint);display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.pill.on{color:var(--good);border-color:#2C4A3C}.pill.on .dot{background:var(--good)}
+.pill.deaf{color:var(--bad);border-color:#4A2C28}.pill.deaf .dot{background:var(--bad)}
+
+.grid{display:grid;grid-template-columns:320px 1fr;gap:0;height:calc(100vh - 58px)}
+@media(max-width:820px){.grid{grid-template-columns:1fr;height:auto}}
+aside{border-right:1px solid var(--line);padding:20px;overflow-y:auto;background:var(--panel)}
+main{display:flex;flex-direction:column;min-height:0}
+
+h2{font-family:"Oswald",sans-serif;font-weight:500;text-transform:uppercase;
+  letter-spacing:.09em;font-size:11.5px;color:var(--faint);margin:0 0 12px}
+.blk{margin-bottom:26px}
+
+/* meters */
+.meter{margin-bottom:14px}
+.mrow{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.mlab{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--dim)}
+.mval{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--brass);
+  font-variant-numeric:tabular-nums}
+.bars{display:flex;gap:2px;height:22px;align-items:flex-end}
+.bars i{flex:1;background:var(--sunk);border-radius:1px;transition:background .06s}
+.bars i.lit{background:var(--good)}
+.bars i.hot{background:var(--bad)}
+body.deaf .bars i.lit,body.deaf .bars i.hot{background:var(--line)}
+.qbar{height:8px;background:var(--sunk);border-radius:1px;overflow:hidden}
+.qbar div{height:100%;width:0;background:var(--blu);transition:width .2s}
+
+/* buttons */
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font-family:"Oswald",sans-serif;text-transform:uppercase;letter-spacing:.06em;
+  font-size:12px;padding:11px 8px;background:var(--sunk);color:var(--ink);
+  border:1px solid var(--line);border-radius:2px;cursor:pointer;transition:.12s}
+button:hover:not(:disabled){border-color:var(--brass);color:var(--brass)}
+button:active:not(:disabled){transform:translateY(1px)}
+button:disabled{opacity:.35;cursor:not-allowed}
+button.wide{grid-column:1/-1}
+button.pri{border-color:#4A3D22;color:var(--brass)}
+button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+/* volume */
+input[type=range]{width:100%;accent-color:var(--brass)}
+
+/* segmented source switch */
+.seg{display:flex;margin-bottom:14px;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.seg button{flex:1;border:0;border-radius:0;background:var(--sunk);padding:9px 6px;font-size:11.5px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:#2A2010;color:var(--brass)}
+.seg button:hover:not(.on):not(:disabled){color:var(--brass)}
+
+/* segmented switches */
+.seg{display:flex;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.seg button{flex:1;border:0;border-radius:0;background:var(--sunk);color:var(--faint);
+  padding:10px 6px;font-size:11px}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button:hover:not(.on):not(:disabled){color:var(--dim)}
+.seg button.on{background:#20303B;color:var(--brass)}
+.hint{font-family:"IBM Plex Mono",monospace;font-size:10.5px;line-height:1.6;
+  color:var(--faint);margin:9px 0 0}
+
+/* tabs */
+.tabs{display:flex;gap:4px}
+.tab{font-family:"Oswald",sans-serif;text-transform:uppercase;letter-spacing:.08em;
+  font-size:11px;padding:8px 14px;background:transparent;border:1px solid transparent;
+  color:var(--faint);border-radius:2px}
+.tab:hover{color:var(--dim)}
+.tab.on{color:var(--brass);border-color:var(--line);background:var(--sunk)}
+
+/* history */
+.call{border:1px solid var(--line);border-radius:3px;margin-bottom:12px;overflow:hidden}
+.call summary{padding:11px 15px;background:var(--panel);cursor:pointer;
+  display:flex;gap:14px;align-items:baseline;list-style:none}
+.call summary::-webkit-details-marker{display:none}
+.call summary:hover{background:var(--sunk)}
+.call .when{font-family:"Oswald",sans-serif;text-transform:uppercase;
+  letter-spacing:.05em;font-size:13px}
+.call .meta{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);
+  margin-left:auto;display:flex;gap:14px}
+.call .body{padding:14px 15px;display:flex;flex-direction:column;gap:10px;
+  border-top:1px solid var(--line)}
+.hturn{display:flex;gap:11px;align-items:baseline}
+.hwho{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--faint);min-width:62px;flex-shrink:0;padding-top:3px}
+.hturn.op .hwho{color:var(--brass)}
+.hturn.you .hwho{color:var(--blu)}
+.htxt{line-height:1.5}
+
+/* test rows */
+.trow{display:grid;grid-template-columns:16px 1fr auto;gap:12px;align-items:baseline;
+  padding:11px 4px;border-bottom:1px solid var(--line)}
+.tick{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1}
+.tick.ok{color:var(--good)} .tick.no{color:var(--bad)}
+.tname{font-family:"Oswald",sans-serif;text-transform:uppercase;letter-spacing:.05em;
+  font-size:13px}
+.tdet{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);
+  display:block;margin-top:3px;letter-spacing:.01em}
+.twhen{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);
+  font-variant-numeric:tabular-nums}
+
+/* stats */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat b{display:block;font-family:"Oswald",sans-serif;font-size:21px;font-weight:500;
+  color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--faint)}
+
+/* conversation */
+.convhead{display:flex;align-items:center;gap:12px;padding:14px 22px;
+  border-bottom:1px solid var(--line)}
+.feed{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:13px;min-height:0}
+.turn{max-width:min(680px,88%);display:flex;flex-direction:column;gap:4px}
+.turn.you{align-self:flex-end;align-items:flex-end}
+.who{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--faint)}
+.bub{padding:11px 15px;border-radius:3px;line-height:1.5;background:var(--panel);
+  border:1px solid var(--line)}
+.turn.you .bub{border-left:3px solid var(--blu)}
+.turn.op .bub{border-left:3px solid var(--brass);background:var(--sunk)}
+.turn.live .bub{border-style:dashed;color:var(--dim);font-style:italic}
+.turn.note{align-self:center;max-width:100%}
+.turn.note .bub{background:transparent;border:0;color:var(--faint);
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;padding:3px 0}
+.empty{color:var(--faint);text-align:center;margin:auto;font-size:14px;line-height:1.8}
+footer{padding:9px 22px;border-top:1px solid var(--line);
+  font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);
+  display:flex;gap:18px;flex-wrap:wrap}
+/* ---- mode + notes ---- */
+.mode-hint{font-size:11.5px;color:var(--faint);line-height:1.5;margin:10px 0 0}
+body.listening .feed#feed::before{content:"Listening only \2014  Furby is muted. Say \201cHey Furby\201d  or press Talk to bring it back.";
+  display:block;padding:10px 14px;margin-bottom:6px;border:1px dashed var(--brass);
+  color:var(--brass);font-size:12.5px;border-radius:2px}
+.tab .badge{display:inline-block;min-width:16px;padding:0 5px;margin-left:6px;border-radius:8px;
+  background:var(--brass);color:var(--bg);font-size:10px;line-height:16px;text-align:center}
+.tab .badge:empty{display:none}
+
+#pane-notes{gap:0;padding-top:12px}
+.nbar{display:flex;align-items:center;gap:8px;padding:0 0 12px;margin-bottom:6px;
+  border-bottom:1px solid var(--line);position:sticky;top:-22px;background:var(--bg);z-index:1}
+.nbar .nstate{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);
+  display:flex;align-items:center;gap:7px}
+.nbar .nstate i{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.nbar .nstate.on{color:var(--good)} .nbar .nstate.on i{background:var(--good)}
+.nbar button{padding:6px 11px;font-size:11px}
+.nbar .grow{flex:1}
+.nday{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);margin:18px 0 6px}
+.nrow{display:grid;grid-template-columns:70px 88px 1fr;gap:12px;align-items:baseline;
+  padding:7px 0;border-bottom:1px solid #1B252D}
+.nrow .nt{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);
+  font-variant-numeric:tabular-nums}
+.nrow .ns{font-family:"Oswald",sans-serif;font-size:11.5px;text-transform:uppercase;letter-spacing:.07em}
+.nrow .nx{line-height:1.55}
+.nrow.agent .ns{color:var(--brass)} .nrow.agent .nx{color:var(--dim)}
+.ns.sA{color:var(--blu)} .ns.sB{color:var(--good)} .ns.sC{color:var(--warn)} .ns.sD{color:var(--bad)}
+.nrow.partial .nx{color:var(--faint);font-style:italic}
+.nempty{color:var(--faint);text-align:center;margin:40px auto;font-size:14px;line-height:1.8}
+/* ---- chat with your notes ---- */
+#pane-chat{display:flex;flex-direction:column;padding:0;gap:0}
+.cmsgs{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:16px;min-height:0}
+.cmsg{max-width:min(680px,90%);display:flex;flex-direction:column;gap:5px}
+.cmsg.me{align-self:flex-end;align-items:flex-end}
+.cmsg .who{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--faint)}
+.cbody{padding:11px 15px;border-radius:3px;line-height:1.55;border:1px solid var(--line);background:var(--panel)}
+.cmsg.me .cbody{border-left:3px solid var(--blu);white-space:pre-wrap}
+.cmsg.ai .cbody{border-left:3px solid var(--brass);background:var(--sunk)}
+.cmsg.err .cbody{border-left:3px solid var(--bad);color:var(--bad)}
+.cbody p{margin:0 0 8px}.cbody p:last-child{margin:0}
+.cbody ul{margin:4px 0 8px;padding-left:20px}.cbody li{margin:3px 0}
+.cbody strong{color:var(--ink);font-weight:600}
+.cite{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--brass);
+  border:1px solid #3A3020;border-radius:2px;padding:0 4px;white-space:nowrap}
+.cmsg.ai.typing .cbody:empty::after{content:"thinking\2026";color:var(--faint);font-style:italic}
+.cempty{margin:auto;text-align:center;color:var(--faint);max-width:440px}
+.cempty h3{font-family:"Oswald",sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--dim);font-size:15px;margin:0 0 6px}
+.cempty p{font-size:13.5px;margin:0 0 16px;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chips button{font-family:"Libre Franklin",sans-serif;text-transform:none;letter-spacing:0;
+  font-size:13px;padding:8px 12px}
+.composer{border-top:1px solid var(--line);padding:14px 22px 16px;display:flex;flex-direction:column;gap:10px}
+.crow{display:flex;gap:8px;align-items:flex-end}
+.crow textarea{flex:1;resize:none;min-height:42px;max-height:160px;padding:11px 13px;
+  background:var(--sunk);color:var(--ink);border:1px solid var(--line);border-radius:2px;
+  font:inherit;line-height:1.45}
+.crow textarea:focus{outline:none;border-color:var(--brass)}
+.crow button{padding:12px 18px}
+.cmeta{display:flex;align-items:center;gap:10px;font-family:"IBM Plex Mono",monospace;
+  font-size:11px;color:var(--faint)}
+.cmeta select{background:var(--sunk);color:var(--dim);border:1px solid var(--line);border-radius:2px;
+  font:inherit;padding:4px 6px;max-width:260px}
+.cmeta .grow{flex:1}
+.cmeta button{padding:4px 10px;font-size:10.5px}
+button.end{border-color:var(--bad);color:var(--bad)}
+button.end:hover:not(:disabled){border-color:var(--bad);color:var(--bad);background:#2A1714}
+</style>
+
+<header>
+  <h1>Line 1 <span>·</span> Monitor</h1>
+  <div class="pills">
+    <span class="pill" id="p-esp"><i class="dot"></i>ESP32</span>
+    <span class="pill" id="p-agent"><i class="dot"></i>Agent</span>
+    <span class="pill" id="p-gate"><i class="dot"></i>Listening</span>
+    <span class="pill" id="p-notes"><i class="dot"></i>Notes</span>
+    <span class="pill" id="p-relay"><i class="dot"></i>Relay</span>
+  </div>
+</header>
+
+<div class="grid">
+<aside>
+  <div class="blk">
+    <h2>Mode</h2>
+    <div class="seg" id="mode-seg">
+      <button class="on" data-mode="talk">Talk + notes</button>
+      <button data-mode="notes">Notes only</button>
+    </div>
+    <p class="mode-hint" id="mode-hint">Furby answers, and every turn is also written to Notes.</p>
+  </div>
+
+  <div class="blk">
+    <h2>Microphone</h2>
+    <div class="seg" id="mic-seg">
+      <button class="on" data-mic="phone">XIAO</button>
+      <button data-mic="mac">Mac</button>
+    </div>
+    <div class="meter">
+      <div class="mrow"><span class="mlab" id="mic-lab">Level</span><span class="mval" id="mic-val">—</span></div>
+      <div class="bars" id="bars"></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h2>Speaker</h2>
+    <div class="meter">
+      <div class="mrow"><span class="mlab">Buffered</span><span class="mval" id="q-val">0 ms</span></div>
+      <div class="qbar"><div id="q-bar"></div></div>
+    </div>
+    <div class="mrow" style="margin-top:14px">
+      <span class="mlab">Volume</span><span class="mval" id="vol-val">50%</span>
+    </div>
+    <input type="range" id="vol" min="0" max="100" value="50">
+  </div>
+
+  <div class="blk">
+    <h2>Where the voice comes out</h2>
+    <div class="seg" id="seg-out">
+      <button data-out="phone" class="on">Phone speaker</button>
+      <button data-out="mac">Mac speakers</button>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h2>Echo control</h2>
+    <div class="seg" id="seg-gate">
+      <button data-gate="1" class="on">Mute mic</button>
+      <button data-gate="0">Turn detection</button>
+    </div>
+    <p class="hint" id="gate-hint">Microphone is held shut while the agent
+      speaks. Reliable, but no interrupting.</p>
+  </div>
+
+  <div class="blk">
+    <h2>Call</h2>
+    <div class="btns" style="margin-bottom:26px">
+      <button class="wide pri" data-cmd="call">Start a call (no phone)</button>
+    </div>
+
+    <h2>Test the hardware</h2>
+    <div class="btns">
+      <button data-cmd="beep">Beep</button>
+      <button data-cmd="dialtone">Dial tone</button>
+      <button data-cmd="sweep">Sweep</button>
+      <button data-cmd="ring">Ring</button>
+      <button class="wide pri" data-cmd="echo">Record 3s &amp; play back</button>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h2>Session</h2>
+    <div class="stats">
+      <div class="stat"><b id="s-turns">0</b><span>replies</span></div>
+      <div class="stat"><b id="s-sent">0s</b><span>heard</span></div>
+      <div class="stat"><b id="s-echo">0s</b><span>echo blocked</span></div>
+      <div class="stat"><b id="s-voice">—</b><span>voice</span></div>
+    </div>
+  </div>
+</aside>
+
+<main>
+  <div class="convhead">
+    <div class="tabs">
+      <button class="tab on" data-tab="live">Live</button>
+      <button class="tab" data-tab="notes">Notes<span class="badge" id="notes-badge"></span></button>
+      <button class="tab" data-tab="chat">Chat</button>
+      <button class="tab" data-tab="calls">Past calls</button>
+      <button class="tab" data-tab="tests">Test log</button>
+    </div>
+    <button style="margin-left:auto;padding:7px 12px" data-cmd="clear">Clear live</button>
+  </div>
+  <div class="feed" id="feed">
+    <div class="empty" id="empty">Waiting for the phone.<br>Say something, or press a test button.</div>
+  </div>
+  <div class="feed" id="pane-notes" hidden>
+    <div class="nbar">
+      <span class="nstate" id="nstate"><i></i><span id="nstate-t">notetaker offline</span></span>
+      <span class="grow"></span>
+      <button id="notes-copy">Copy</button>
+      <button id="notes-dl">Download .md</button>
+    </div>
+    <div id="notes-list"></div>
+    <div class="nrow partial" id="notes-partial" hidden>
+      <span class="nt">now</span><span class="ns"></span><span class="nx"></span>
+    </div>
+  </div>
+  <div class="feed" id="pane-chat" hidden>
+    <div class="cmsgs" id="cmsgs">
+      <div class="cempty" id="cempty">
+        <h3>Ask your notes</h3>
+        <p>Questions are answered only from what the phone has written down, with the time
+           each thing was said. It will tell you when the notes don't cover something.</p>
+        <div class="chips">
+          <button data-ask="What did we talk about today?">What did we talk about today?</button>
+          <button data-ask="Are there any reminders or action items?">Any reminders or action items?</button>
+          <button data-ask="Summarise my most recent conversation.">Summarise my last conversation</button>
+          <button data-ask="What did each speaker say?">What did each speaker say?</button>
+        </div>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="crow">
+        <textarea id="cin" rows="1" placeholder="Ask about your notes…"></textarea>
+        <button class="pri" id="csend">Send</button>
+      </div>
+      <div class="cmeta">
+        <span>model</span>
+        <select id="cmodel" aria-label="Model"><option>claude-haiku-4-5-20251001</option></select>
+        <span class="grow"></span>
+        <span>via AssemblyAI LLM Gateway</span>
+        <button id="cnew">New chat</button>
+      </div>
+    </div>
+  </div>
+  <div class="feed" id="pane-calls" hidden></div>
+  <div class="feed" id="pane-tests" hidden></div>
+  <footer>
+    <span id="f-state">connecting…</span>
+    <span id="f-profile"></span>
+    <span style="margin-left:auto" id="f-gate"></span>
+  </footer>
+</main>
+</div>
+
+<script>
+const NBARS = 28;
+const bars = document.getElementById('bars');
+for (let i = 0; i < NBARS; i++) bars.appendChild(document.createElement('i'));
+const barEls = [...bars.children];
+
+const $ = id => document.getElementById(id);
+const feed = $('feed');
+let live = null, deaf = false, ws = null;
+
+function pill(id, on, cls) {
+  const el = $(id);
+  el.classList.toggle('on', !!on && cls !== 'deaf');
+  el.classList.toggle('deaf', cls === 'deaf');
+}
+
+function level(rms) {
+  const lit = Math.round(Math.min(rms, 1) * NBARS);
+  barEls.forEach((b, i) => {
+    b.className = i < lit ? (i > NBARS * 0.82 ? 'hot' : 'lit') : '';
+    b.style.height = (26 + (i / NBARS) * 74) + '%';
+  });
+  $('mic-val').textContent = deaf ? 'muted' : Math.round(Math.min(rms, 1) * 100) + '%';
+}
+
+function addTurn(kind, text) {
+  $('empty')?.remove();
+  if (kind === 'partial') {
+    if (!live) {
+      live = document.createElement('div');
+      live.className = 'turn you live';
+      live.innerHTML = '<div class="who">You · speaking</div><div class="bub"></div>';
+      feed.appendChild(live);
+    }
+    live.querySelector('.bub').textContent = text;
+  } else {
+    if (kind === 'user' && live) { live.remove(); live = null; }
+    const d = document.createElement('div');
+    d.className = 'turn ' + (kind === 'user' ? 'you' : kind === 'agent' ? 'op' : 'note');
+    const who = kind === 'user' ? 'You' : kind === 'agent' ? 'Operator' : '';
+    d.innerHTML = (who ? `<div class="who">${who}</div>` : '') + '<div class="bub"></div>';
+    d.querySelector('.bub').textContent = text;
+    feed.appendChild(d);
+  }
+  feed.scrollTop = feed.scrollHeight;
+}
+
+function send(cmd, extra = {}) {
+  if (ws && ws.readyState === 1) ws.send(JSON.stringify({ cmd, ...extra }));
+}
+
+document.querySelectorAll('button[data-cmd]').forEach(b =>
+  b.addEventListener('click', () => send(b.dataset.cmd)));
+
+document.querySelectorAll('#seg-out button').forEach(b =>
+  b.addEventListener('click', () => send('output', { value: b.dataset.out })));
+
+document.querySelectorAll('#seg-gate button').forEach(b =>
+  b.addEventListener('click', () => send('gate', { value: b.dataset.gate === '1' })));
+
+const GATE_HINT = {
+  on: 'Microphone is held shut while the agent speaks. Reliable, but no interrupting.',
+  off: 'Mic stays open; the server decides when your turn ends. Barge-in works, '
+     + 'but the agent may hear itself through the speaker.',
+};
+
+function seg(sel, match) {
+  document.querySelectorAll(sel).forEach(b => b.classList.toggle('on', match(b)));
+}
+
+document.querySelectorAll('#mic-seg button').forEach(b =>
+  b.addEventListener('click', () => send('mic', { value: b.dataset.mic })));
+
+$('vol').addEventListener('input', e => {
+  const v = +e.target.value;
+  $('vol-val').textContent = v + '%';
+  send('volume', { value: v / 100 });
+});
+
+const fmtTime = t => new Date(t * 1000).toLocaleTimeString([],
+  { hour: 'numeric', minute: '2-digit' });
+const fmtDay = t => new Date(t * 1000).toLocaleDateString([],
+  { month: 'short', day: 'numeric' });
+
+async function lines(file) {
+  try {
+    const r = await fetch(file + '?t=' + Date.now());
+    if (!r.ok) return [];
+    return (await r.text()).trim().split('\n')
+      .filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } })
+      .filter(Boolean);
+  } catch { return []; }
+}
+
+// ---------------------------------------------------------------- notes
+let notesRows = [], notesLoaded = false, unread = 0;
+const fmtClock = t => new Date(t * 1000).toLocaleTimeString([],
+  { hour: '2-digit', minute: '2-digit' });
+const spkName = r => r.src === 'agent' ? r.speaker
+                   : (r.speaker && r.speaker !== '?' ? 'Speaker ' + r.speaker : 'Speaker');
+const spkClass = r => r.src === 'agent' ? '' : 's' + (r.speaker || '').slice(0, 1);
+
+function noteRow(r) {
+  const d = document.createElement('div');
+  d.className = 'nrow' + (r.src === 'agent' ? ' agent' : '');
+  d.innerHTML = '<span class="nt"></span><span class="ns"></span><span class="nx"></span>';
+  d.children[0].textContent = fmtClock(r.t);
+  d.children[1].textContent = spkName(r);
+  if (spkClass(r)) d.children[1].classList.add(spkClass(r));
+  d.children[2].textContent = r.text;
+  return d;
+}
+
+function renderNotes() {
+  const list = $('notes-list');
+  list.innerHTML = '';
+  if (!notesRows.length) {
+    list.innerHTML = '<div class="nempty">No notes yet.<br>Anything said near the phone ' +
+                     'is transcribed here, with speakers labelled.</div>';
+    return;
+  }
+  let day = '';
+  for (const r of notesRows) {
+    const d = fmtDay(r.t);
+    if (d !== day) {
+      day = d;
+      const h = document.createElement('div');
+      h.className = 'nday'; h.textContent = d;
+      list.appendChild(h);
+    }
+    list.appendChild(noteRow(r));
+  }
+}
+
+async function loadNotes() {
+  notesRows = await lines('notes.jsonl');
+  notesLoaded = true;
+  renderNotes();
+  const pane = $('pane-notes'); pane.scrollTop = pane.scrollHeight;
+}
+
+function onNoteTurn(r) {
+  $('notes-partial').hidden = true;
+  if (!notesLoaded) return;             // it is in the file; the tab loads it
+  if (!notesRows.length) $('notes-list').innerHTML = '';
+  const last = notesRows[notesRows.length - 1];
+  notesRows.push(r);
+  if (!last || fmtDay(last.t) !== fmtDay(r.t)) {
+    const h = document.createElement('div');
+    h.className = 'nday'; h.textContent = fmtDay(r.t);
+    $('notes-list').appendChild(h);
+  }
+  $('notes-list').appendChild(noteRow(r));
+  const pane = $('pane-notes');
+  if (!pane.hidden) pane.scrollTop = pane.scrollHeight;
+  else $('notes-badge').textContent = ++unread > 99 ? '99+' : unread;
+}
+
+function onNotePartial(m) {
+  const p = $('notes-partial');
+  p.hidden = false;
+  p.children[1].textContent = m.speaker && m.speaker !== '?' ? 'Speaker ' + m.speaker : 'Speaker';
+  p.children[1].className = 'ns s' + (m.speaker || '').slice(0, 1);
+  p.children[2].textContent = m.text;
+  const pane = $('pane-notes');
+  if (!pane.hidden) pane.scrollTop = pane.scrollHeight;
+}
+
+function notesText(md) {
+  let out = md ? '# Notes\n' : '', day = '';
+  for (const r of notesRows) {
+    const d = fmtDay(r.t);
+    if (d !== day) { day = d; out += md ? `\n## ${d}\n\n` : `\n${d}\n`; }
+    out += md ? `- **${fmtClock(r.t)} ${spkName(r)}:** ${r.text}\n`
+              : `${fmtClock(r.t)}  ${spkName(r)}: ${r.text}\n`;
+  }
+  return out.trim() + '\n';
+}
+
+$('notes-copy').addEventListener('click', async () => {
+  if (!notesLoaded) await loadNotes();
+  try {
+    await navigator.clipboard.writeText(notesText(false));
+    $('notes-copy').textContent = 'Copied';
+  } catch { $('notes-copy').textContent = 'Copy failed'; }
+  setTimeout(() => $('notes-copy').textContent = 'Copy', 1400);
+});
+$('notes-dl').addEventListener('click', async () => {
+  if (!notesLoaded) await loadNotes();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([notesText(true)], { type: 'text/markdown' }));
+  a.download = `notes-${new Date().toISOString().slice(0, 10)}.md`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+function showMode(mode) {
+  document.querySelectorAll('#mode-seg button').forEach(b =>
+    b.classList.toggle('on', b.dataset.mode === mode));
+  document.body.classList.toggle('listening', mode === 'notes');
+  $('mode-hint').textContent = mode === 'notes'
+    ? 'Furby is muted and only notes are taken. Say \u201cHey Furby\u201d to talk again.'
+    : 'Furby answers, and every turn is also written to Notes.';
+}
+document.querySelectorAll('#mode-seg button').forEach(b =>
+  b.addEventListener('click', () => send('mode', { value: b.dataset.mode })));
+
+// ---------------------------------------------------------------- chat with your notes
+let chatHistory = [], chatLive = null;       // chatLive: {id, el, text}
+const esc = s => s.replace(/[&<>"']/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// Markdown-lite. Everything is escaped FIRST; the only tags that can appear are
+// the few added back below. Both the notes and the model's reply are text we
+// do not control, so neither may ever reach the page as raw HTML.
+function inline(s) {
+  return s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\[([A-Z][a-z]{2} \d{1,2} \d{2}:\d{2})\]/g, '<span class="cite">$1</span>');
+}
+function renderMd(text) {
+  let html = '', list = false;
+  for (const ln of esc(text).split('\n')) {
+    const li = ln.match(/^\s*(?:[-*\u2022]|\d+\.)\s+(.*)/);
+    if (li) { if (!list) { html += '<ul>'; list = true; } html += `<li>${inline(li[1])}</li>`; continue; }
+    if (list) { html += '</ul>'; list = false; }
+    if (ln.trim()) html += `<p>${inline(ln.replace(/^#+\s*/, ''))}</p>`;
+  }
+  return html + (list ? '</ul>' : '');
+}
+
+function chatBubble(kind, text) {
+  $('cempty')?.remove();
+  const d = document.createElement('div');
+  d.className = 'cmsg ' + kind;
+  d.innerHTML = `<div class="who">${kind === 'me' ? 'You' : kind === 'err' ? 'Error' : 'Notes'}</div>
+                 <div class="cbody"></div>`;
+  const body = d.querySelector('.cbody');
+  if (kind === 'me' || kind === 'err') body.textContent = text; else body.innerHTML = renderMd(text);
+  $('cmsgs').appendChild(d);
+  $('cmsgs').scrollTop = $('cmsgs').scrollHeight;
+  return d;
+}
+
+function setBusy(busy) {
+  $('csend').textContent = busy ? 'Stop' : 'Send';
+  $('cin').disabled = busy;
+}
+
+function ask(question) {
+  question = question.trim();
+  if (!question) return;
+  if (chatLive) return;                              // one at a time
+  if (!ws || ws.readyState !== 1) { chatBubble('err', 'Not connected to the relay.'); return; }
+  chatBubble('me', question);
+  const el = chatBubble('ai', '');
+  el.classList.add('typing');
+  const id = Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+  chatLive = { id, el, text: '', question };
+  setBusy(true);
+  send('chat', { id, question, model: $('cmodel').value, history: chatHistory });
+  $('cin').value = ''; $('cin').style.height = '';
+}
+
+function chatFinished(m) {
+  if (!chatLive || m.id !== chatLive.id) return;
+  chatLive.el.classList.remove('typing');
+  if (m.type === 'chat_error') {
+    chatLive.el.remove();
+    chatBubble('err', 'The model could not answer: ' + (m.error || 'unknown error'));
+  } else {
+    chatHistory.push({ role: 'user', content: chatLive.question },
+                     { role: 'assistant', content: chatLive.text });
+    chatHistory = chatHistory.slice(-12);
+  }
+  chatLive = null;
+  setBusy(false);
+  $('cin').focus();
+}
+
+$('csend').addEventListener('click', () => {
+  if (chatLive) { send('chat_stop', { id: chatLive.id }); return; }
+  ask($('cin').value);
+});
+$('cin').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); ask($('cin').value); }
+});
+$('cin').addEventListener('input', e => {        // grow with the text, up to a limit
+  e.target.style.height = ''; e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px';
+});
+document.querySelectorAll('[data-ask]').forEach(b =>
+  b.addEventListener('click', () => ask(b.dataset.ask)));
+$('cnew').addEventListener('click', () => {
+  if (chatLive) send('chat_stop', { id: chatLive.id });
+  chatHistory = []; chatLive = null; setBusy(false);
+  $('cmsgs').innerHTML = '';
+  $('cmsgs').appendChild(document.createRange().createContextualFragment(
+    '<div class="cempty"><h3>New chat</h3><p>Ask anything about your notes.</p></div>'));
+  $('cin').focus();
+});
+$('cmodel').addEventListener('change', e => {
+  try { localStorage.setItem('chatModel', e.target.value); } catch {}
+});
+
+function showModels(m) {
+  let saved = null;
+  try { saved = localStorage.getItem('chatModel'); } catch {}
+  const sel = $('cmodel');
+  sel.innerHTML = '';
+  const group = (label, list) => {
+    if (!list.length) return;
+    const g = document.createElement('optgroup'); g.label = label;
+    for (const id of list) { const o = document.createElement('option'); o.value = o.textContent = id; g.appendChild(o); }
+    sel.appendChild(g);
+  };
+  const n = m.preferred ?? 0;
+  group('Recommended', m.models.slice(0, n));
+  group(`More models (${m.models.length - n})`, m.models.slice(n));
+  sel.value = (saved && m.models.includes(saved)) ? saved : m.default;
+}
+
+async function loadCalls() {
+  const rows = await lines('session.jsonl');
+  const pane = $('pane-calls');
+  // split on the explicit call markers, falling back to a gap in time for
+  // turns recorded before those markers existed
+  const calls = [];
+  let cur = null;
+  let last = 0;
+  for (const r of rows) {
+    const isStart = r.who === '_call' && r.text === 'start';
+    const gap = last && (r.t - last) > 180;
+    if (isStart || gap || !cur) { cur = { t: r.t, turns: [] }; calls.push(cur); }
+    if (r.who !== '_call') { cur.turns.push(r); cur.t = cur.t || r.t; }
+    last = r.t;
+  }
+  const real = calls.filter(c => c.turns.length);
+  if (!real.length) { pane.innerHTML = '<div class="empty">No calls recorded yet.</div>'; return; }
+
+  pane.innerHTML = '';
+  real.reverse().forEach((c, i) => {
+    const you = c.turns.filter(t => t.who === 'you').length;
+    const op = c.turns.filter(t => t.who === 'operator').length;
+    const d = document.createElement('details');
+    d.className = 'call';
+    if (i === 0) d.open = true;
+    d.innerHTML =
+      `<summary><span class="when">${fmtDay(c.turns[0].t)} · ${fmtTime(c.turns[0].t)}</span>
+        <span class="meta"><span>${c.turns.length} turns</span>
+        <span>${you} you</span><span>${op} agent</span></span></summary>
+       <div class="body"></div>`;
+    const body = d.querySelector('.body');
+    c.turns.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'hturn ' + (t.who === 'you' ? 'you' : 'op');
+      row.innerHTML = `<span class="hwho">${t.who === 'you' ? 'You' : 'Agent'}</span>
+                       <span class="htxt"></span>`;
+      row.querySelector('.htxt').textContent = t.text;
+      body.appendChild(row);
+    });
+    pane.appendChild(d);
+  });
+}
+
+async function loadTests() {
+  const rows = await lines('tests.jsonl');
+  const pane = $('pane-tests');
+  if (!rows.length) {
+    pane.innerHTML = '<div class="empty">No tests run yet.<br>Use the buttons on the left.</div>';
+    return;
+  }
+  pane.innerHTML = '';
+  rows.reverse().forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'trow';
+    row.innerHTML =
+      `<span class="tick ${r.ok ? 'ok' : 'no'}">${r.ok ? '✓' : '✕'}</span>
+       <span><span class="tname"></span><span class="tdet"></span></span>
+       <span class="twhen">${fmtDay(r.t)} ${fmtTime(r.t)}</span>`;
+    row.querySelector('.tname').textContent = r.test;
+    row.querySelector('.tdet').textContent = r.detail || (r.ok ? 'ok' : 'failed');
+    pane.appendChild(row);
+  });
+}
+
+const panes = { live: 'feed', notes: 'pane-notes', chat: 'pane-chat', calls: 'pane-calls', tests: 'pane-tests' };
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === b));
+  for (const [k, id] of Object.entries(panes)) $(id).hidden = (k !== b.dataset.tab);
+  if (b.dataset.tab === 'notes') { loadNotes(); $('notes-badge').textContent = ''; }
+  if (b.dataset.tab === 'chat') setTimeout(() => $('cin').focus(), 0);
+  if (b.dataset.tab === 'calls') loadCalls();
+  if (b.dataset.tab === 'tests') loadTests();
+}));
+
+function connect() {
+  ws = new WebSocket(`ws://${location.hostname}:8090/ui`);
+
+  ws.onopen = () => {
+    pill('p-relay', true);
+    $('f-state').textContent = 'relay connected';
+    send('models');                      // fill the chat's model picker
+  };
+
+  ws.onclose = () => {
+    if (chatLive) chatFinished({ type: 'chat_error', id: chatLive.id,
+                                 error: 'lost the connection to the relay' });
+    pill('p-relay', false); pill('p-esp', false); pill('p-agent', false);
+    $('f-state').textContent = 'relay offline — retrying';
+    document.querySelectorAll('button[data-cmd]').forEach(b => b.disabled = true);
+    setTimeout(connect, 1500);
+  };
+
+  ws.onmessage = ev => {
+    const m = JSON.parse(ev.data);
+
+    if (m.type === 'image') {
+      // No camera panel any more. The relay still forwards frames when a XIAO
+      // with a camera is attached, so drop them here: the catch-all at the end
+      // of this chain would otherwise put each one in the conversation.
+
+    } else if (m.type === 'level') {
+      level(m.rms);
+
+    } else if (m.type === 'stats' || m.type === 'status') {
+      pill('p-esp', m.esp);
+      pill('p-agent', m.agent);
+      deaf = !!m.muted;
+      pill('p-gate', !deaf, deaf ? 'deaf' : '');
+      $('p-gate').lastChild.textContent = deaf ? 'Deaf' : 'Listening';
+      document.body.classList.toggle('deaf', deaf);
+      $('f-gate').textContent = deaf ? 'mic held shut — operator speaking' : '';
+      // What each button actually needs, rather than "is a phone attached".
+      const live = !!(m.esp || m.agent);          // a call is in progress
+      const canPlay = !!(m.esp || !m.to_phone);   // some speaker is reachable
+      document.querySelectorAll('button[data-cmd]').forEach(b => {
+        const c = b.dataset.cmd;
+        if (c === 'call' || c === 'hangup') {
+          // One button: start a laptop call when idle, end the call when live.
+          // It used to just grey out mid-call, leaving no way to hang up.
+          b.dataset.cmd = live ? 'hangup' : 'call';
+          b.textContent = live ? 'Hang up' : 'Start a call (no phone)';
+          b.classList.toggle('end', live);
+          b.disabled = false;
+        }
+        else if (c === 'clear')  b.disabled = false;
+        else                     b.disabled = !canPlay;
+      });
+      // The gate is enforced in the relay for BOTH audio sources, and the
+      // relay only forwards it to the phone when one is attached -- so this
+      // is meaningful with or without an ESP32.
+      document.querySelectorAll('#seg-gate button').forEach(b => b.disabled = false);
+      document.querySelectorAll('[data-out]').forEach(b => b.disabled = !m.esp
+          && b.dataset.out === 'phone');
+
+      if (m.type === 'stats') {
+        if (m.mode) showMode(m.mode);
+        if (m.notes_live !== undefined) {
+          pill('p-notes', m.notes_live);
+          $('nstate').classList.toggle('on', !!m.notes_live);
+          $('nstate-t').textContent = m.notes_live ? 'notetaker live · speakers labelled'
+                                                   : 'notetaker offline';
+        }
+        $('s-turns').textContent = m.turns ?? 0;
+        $('s-sent').textContent = (m.sent_s ?? 0).toFixed(0) + 's';
+        $('s-echo').textContent = (m.echo_s ?? 0).toFixed(0) + 's';
+        $('s-voice').textContent = m.voice ?? '—';
+        if (typeof m.vol === 'number' && document.activeElement !== $('vol')) {
+          const pct = Math.round(m.vol * 100);
+          $('vol').value = pct;
+          $('vol-val').textContent = pct + '%';
+        }
+        if (typeof m.to_phone === 'boolean') {
+          document.querySelectorAll('[data-out]').forEach(b =>
+            b.classList.toggle('on',
+              (b.dataset.out === 'phone') === m.to_phone));
+        }
+        if (m.device) {
+          // "Mac speakers" is whatever audio device the relay picked, which is
+          // usually the reSpeaker. Say so rather than making the user guess.
+          const short = m.device.replace(/\s*\(.*\)$/, '').split(' ').slice(0, 2).join(' ');
+          const out = document.querySelector('[data-out="mac"]');
+          const mic = document.querySelector('#mic-seg [data-mic="mac"]');
+          if (out) out.textContent = short;
+          if (mic) mic.textContent = short;
+        }
+        if (m.mic) {
+          document.querySelectorAll('#mic-seg button').forEach(b =>
+            b.classList.toggle('on', b.dataset.mic === m.mic));
+          document.querySelectorAll('#mic-seg button').forEach(b =>
+            b.disabled = !m.esp && b.dataset.mic === 'phone');
+          $('mic-lab').textContent = m.mic === 'mac' ? 'Level · Mac mic'
+                                                     : 'Level · onboard PDM';
+        }
+        if (m.to_phone !== undefined)
+          seg('#seg-out button', b => b.dataset.out === (m.to_phone ? 'phone' : 'mac'));
+        if (m.gate !== undefined) {
+          seg('#seg-gate button', b => (b.dataset.gate === '1') === !!m.gate);
+          $('gate-hint').textContent = m.gate ? GATE_HINT.on : GATE_HINT.off;
+        }
+        $('f-profile').textContent = `profile ${m.profile} · voice ${m.voice}`;
+        const ms = ((m.queued ?? 0) / 8000) * 1000;
+        $('q-val').textContent = Math.round(ms) + ' ms';
+        $('q-bar').style.width = Math.min(ms / 500 * 100, 100) + '%';
+        if (deaf) level(0);
+      }
+
+    } else if (m.type === 'models') {
+      showModels(m);
+
+    } else if (m.type === 'chat_delta') {
+      if (chatLive && m.id === chatLive.id) {
+        chatLive.text += m.text;
+        chatLive.el.classList.remove('typing');
+        chatLive.el.querySelector('.cbody').innerHTML = renderMd(chatLive.text);
+        $('cmsgs').scrollTop = $('cmsgs').scrollHeight;
+      }
+
+    } else if (m.type === 'chat_done' || m.type === 'chat_error') {
+      chatFinished(m);
+
+    } else if (m.type === 'note_turn') {
+      onNoteTurn(m);
+
+    } else if (m.type === 'note_partial') {
+      onNotePartial(m);
+
+    } else if (m.type === 'mode') {
+      showMode(m.mode);
+
+    } else if (m.type === 'clear') {
+      feed.innerHTML = '';
+      live = null;
+
+    } else if (m.type === 'note') {
+      addTurn('note', m.text);
+      if (!$('pane-tests').hidden) loadTests();
+
+    } else {
+      addTurn(m.type, m.text);
+    }
+  };
+}
+connect();
+</script>

@@ -1,0 +1,48 @@
+{"t": 1791423411.6790001, "src": "mic", "speaker": "A", "text": "What mic do I speak into?", "conf": 0.0}
+{"t": 1791423418.2633011, "src": "agent", "speaker": "Furby", "text": "Hello there! Furby speaking. What would you like to talk about?"}
+{"t": 1791423435.0164149, "src": "mic", "speaker": "B", "text": "Can you hear my", "conf": 1.0}
+{"t": 1791423446.837004, "src": "mic", "speaker": "B", "text": "Oh, I see.", "conf": 1.0}
+{"t": 1791423545.098609, "src": "mic", "speaker": "A", "text": "Okay, you start playing.", "conf": 0.0}
+{"t": 1791423553.442966, "src": "mic", "speaker": "A", "text": "Start a role-playing game for me. Create a role-playing game for me.", "conf": 0.88}
+{"t": 1791423562.770426, "src": "agent", "speaker": "Furby", "text": "Hello there! Furby speaking. What would you like to talk about?"}
+{"t": 1791423680.664905, "src": "mic", "speaker": "A", "text": "For a minute right now.", "conf": 0.0}
+{"t": 1791423684.527978, "src": "mic", "speaker": "PENDING", "text": "Kirby.", "conf": 0.0}
+{"t": 1791423686.633742, "src": "agent", "speaker": "Furby", "text": "Hello there! Furby speaking. What would you like to talk about?"}
+{"t": 1791424981.4013288, "src": "mic", "speaker": "A", "text": "Uh, can you hear me?", "conf": 0.0}
+{"t": 1791424984.571761, "src": "agent", "speaker": "Game Master", "text": "Welcome to Skyrim. Choose a Nord Warrior: health nine, attack eight, mana two; a Bosmer Archer: health six, attack seven, mana four; or a Breton Mage: health five, attack three, mana nine. All scores are out of ten. Who will you be?"}
+{"t": 1791425300.217248, "src": "agent", "speaker": "Game Master", "text": "Welcome to Skyrim. Choose a Nord Warrior: health nine, attack eight, mana two; a Bosmer Archer: health six, attack seven, mana four; or a Breton Mage: health five, attack three, mana nine. All scores are out of ten. Who will you be?"}
+{"t": 1791425302.772434, "src": "agent", "speaker": "Game Master", "text": "Welcome to Skyrim. Choose a Nord Warrior: health nine, attack eight, mana two; a Bosmer Archer: health six, attack seven, mana four; or a Breton Mage: health five, attack three, mana nine. All scores are out of ten. Who will you be?"}
+{"t": 1791425332.7336671, "src": "mic", "speaker": "A", "text": "Yeah, I'm trying to stick out of town.", "conf": 0.0}
+{"t": 1791425337.0631309, "src": "agent", "speaker": "Game Master", "text": "No need to apologize. Would you like to choose one of those three characters, or would you prefer to create your own?"}
+{"t": 1791425337.413367, "src": "mic", "speaker": "B", "text": "Yeah, I'm just trying to think how it's kind of\u2014 yeah, he kills the braces. That's probably harder. So what you can do is just find a bulky end bracelet.", "conf": 0.4}
+{"t": 1791425340.71771, "src": "agent", "speaker": "Game Master", "text": "I'm sorry, I didn't quite catch that. Would you like to pick one of the three characters, or create your own?"}
+{"t": 1791425486.0511339, "src": "mic", "speaker": "A", "text": "Can we do a roll?", "conf": 0.0}
+{"t": 1791425491.330236, "src": "mic", "speaker": "B", "text": "We do a rolling point.", "conf": 1.0}
+{"t": 1791425497.990699, "src": "mic", "speaker": "B", "text": "Almost.", "conf": 1.0}
+{"t": 1791425499.067477, "src": "mic", "speaker": "B", "text": "Roll.", "conf": 1.0}
+{"t": 1791425539.89511, "src": "agent", "speaker": "Game Master", "text": "Welcome to Skyrim. Choose a Nord Warrior: health nine, attack eight, mana two; a Bosmer Archer: health six, attack seven, mana four; or a Breton Mage: health five, attack three, mana nine. All scores are out of ten. Who will you be?"}
+{"t": 1791425581.4388978, "src": "mic", "speaker": "A", "text": "Okay, can you start at", "conf": 0.0}
+{"t": 1791425582.0872152, "src": "mic", "speaker": "PENDING", "text": "Damn.", "conf": 0.0}
+{"t": 1791426932.178876, "src": "mic", "speaker": "PENDING", "text": "Yeah.", "conf": 0.0}
+{"t": 1791426935.355536, "src": "agent", "speaker": "Game Master", "text": "Welcome to Skyrim. Choose a Nord Warrior: health nine, attack eight, mana two; a Bosmer Archer: health six, attack seven, mana four; or a Breton Mage: health five, attack three, mana nine. All scores are out of ten. Who will you be?"}
+{"t": 1791426943.012226, "src": "mic", "speaker": "A", "text": "I will be the Nord warrior.", "conf": 0.0}
+{"t": 1791427016.398432, "src": "agent", "speaker": "Game Master", "text": "Welcome to Skyrim. Choose a Nord Warrior: health nine, attack eight, mana two; a Bosmer Archer: health six, attack seven, mana four; or a Breton Mage: health five, attack three, mana nine. All scores are out of ten. Who will you be?"}
+{"t": 1791427021.654132, "src": "mic", "speaker": "A", "text": "I will be the Nord warrior.", "conf": 0.0}
+{"t": 1791427173.388546, "src": "agent", "speaker": "Game Master", "text": "Welcome to Skyrim. Choose a Nord Warrior: health nine, attack eight, mana two; a Bosmer Archer: health six, attack seven, mana four; or a Breton Mage: health five, attack three, mana nine. All scores are out of ten. Who will you be?"}
+{"t": 1791427180.1633012, "src": "mic", "speaker": "A", "text": "I will be the Nord warrior.", "conf": 0.0}
+{"t": 1791427189.0738409, "src": "mic", "speaker": "PENDING", "text": "Space.", "conf": 0.0}
+{"t": 1791427192.085212, "src": "mic", "speaker": "PENDING", "text": "For where.", "conf": 0.0}
+{"t": 1791427198.8735309, "src": "agent", "speaker": "Game Master", "text": "The die rolls a nine. The sky above the pale mountains is choked with smoke and the deafening roar of a dragon. A shadow sweeps over you, followed by the scent of sulfur and scorched earth. What do you do?"}
+{"t": 1791427209.605524, "src": "mic", "speaker": "B", "text": "I will attack the dragon.", "conf": 1.0}
+{"t": 1791427219.329119, "src": "agent", "speaker": "Game Master", "text": "To hit the dragon, you must roll a fourteen or lower. The die rolls six. Your heavy steel blade bites deep into the creature's scales as you swing with desperate fury. What do you do?"}
+{"t": 1791427227.878646, "src": "mic", "speaker": "B", "text": "I run away.", "conf": 1.0}
+{"t": 1791427241.033188, "src": "agent", "speaker": "Game Master", "text": "You turn and sprint through the blackened grass, your lungs burning as you flee the dragon's path. The ground trembles under its weight, and the heat from its breath lashes at your back. What do you do?"}
+{"t": 1791427249.704522, "src": "mic", "speaker": "B", "text": "Anyone have any suggestions?", "conf": 0.81}
+{"t": 1791427265.013748, "src": "agent", "speaker": "Game Master", "text": "The dragon lets out a piercing shriek that echoes off the mountain peaks, but the landscape remains empty of people. You are alone in the shadow of the beast, with only the sound of your own heavy breathing to accompany you. What do you do?"}
+{"t": 1791427272.438633, "src": "mic", "speaker": "B", "text": "I'll take my chances and attack the dragon again.", "conf": 0.79}
+{"t": 1791427276.739927, "src": "mic", "speaker": "B", "text": "So basically", "conf": 0.79}
+{"t": 1791427291.126904, "src": "agent", "speaker": "Game Master", "text": "To hit the dragon again, you must roll a fourteen or lower. The die rolls three. This is an exceptional success. Your blade finds a soft gap in the dragon's underbelly, slicing through muscle and causing the beast to howl in sudden, genuine pain. What do you do?"}
+{"t": 1791427296.0456388, "src": "mic", "speaker": "B", "text": "Celebrate with victory and end the game.", "conf": 0.69}
+{"t": 1791427302.4152892, "src": "mic", "speaker": "B", "text": "Now.", "conf": 0.69}
+{"t": 1791487723.828732, "src": "agent", "speaker": "Game Master", "text": "Welcome to Skyrim. Choose a Nord Warrior: health nine, attack eight, mana two; a Bosmer Archer: health six, attack seven, mana four; or a Breton Mage: health five, attack three, mana nine. All scores are out of ten. Who will you be?"}
+{"t": 1791487790.36817, "src": "mic", "speaker": "A", "text": "I choose to be the Nord warrior.", "conf": 0.0}
